@@ -1,0 +1,127 @@
+{
+  "retrieval": [
+    {
+      "question": "How many unused leave days can I carry over?",
+      "document": "employee-handbook.md",
+      "contains": "five unused days"
+    },
+    {
+      "question": "By what date do I have to use carried-over leave?",
+      "document": "employee-handbook.md",
+      "contains": "31 March"
+    },
+    {
+      "question": "How long is parental leave?",
+      "document": "employee-handbook.md",
+      "contains": "16 weeks"
+    },
+    {
+      "question": "Which days am I expected in the office?",
+      "document": "employee-handbook.md",
+      "contains": "Tuesday, Wednesday and Thursday"
+    },
+    {
+      "question": "What is the deadline for submitting an expense claim?",
+      "document": "employee-handbook.md",
+      "contains": "within 30 days"
+    },
+    {
+      "question": "What should I do if my laptop is stolen?",
+      "document": "employee-handbook.md",
+      "contains": "within one hour"
+    },
+    {
+      "question": "What does error E-4012 mean?",
+      "document": "support-runbook.md",
+      "contains": "calibration"
+    },
+    {
+      "question": "E-5100",
+      "document": "support-runbook.md",
+      "contains": "firmware"
+    },
+    {
+      "question": "How quickly must we respond to a SEV1 incident?",
+      "document": "support-runbook.md",
+      "contains": "15 minutes"
+    },
+    {
+      "question": "What is the API rate limit?",
+      "document": "support-runbook.md",
+      "contains": "600 requests per minute"
+    },
+    {
+      "question": "When is planned maintenance done?",
+      "document": "support-runbook.md",
+      "contains": "Sundays between 02:00 and 04:00"
+    },
+    {
+      "question": "How long do we keep raw sensor readings?",
+      "document": "support-runbook.md",
+      "contains": "13 months"
+    },
+    {
+      "question": "How long is the warranty on a sensor?",
+      "document": "returns-and-warranty.pdf",
+      "contains": "24 month"
+    },
+    {
+      "question": "What kind of damage is not covered by the warranty?",
+      "document": "returns-and-warranty.pdf",
+      "contains": "rated depth of 50 metres"
+    },
+    {
+      "question": "How soon is a refund paid after a return?",
+      "document": "returns-and-warranty.pdf",
+      "contains": "7 business days"
+    },
+    {
+      "question": "How long does Kestrel calibration fluid last once opened?",
+      "document": "vendor-note.txt",
+      "contains": "60 days once opened"
+    }
+  ],
+  "offTopic": [
+    "What is the capital of France?",
+    "How do I bake sourdough bread?"
+  ],
+  "answers": [
+    {
+      "question": "How many unused leave days can I carry over, and until when?",
+      "mustMatch": [
+        "\\b(five|5)\\b",
+        "31 March"
+      ],
+      "mustNotMatch": [],
+      "cites": true
+    },
+    {
+      "question": "How long is the warranty on a sensor?",
+      "mustMatch": [
+        "24"
+      ],
+      "mustNotMatch": [
+        "10[ -]year"
+      ],
+      "cites": true
+    },
+    {
+      "question": "Who handles error E-4012?",
+      "mustMatch": [
+        "calibration"
+      ],
+      "mustNotMatch": [],
+      "cites": true
+    },
+    {
+      "question": "What is the salary of the chief executive?",
+      "mustMatch": [
+        "(not|n't|no )"
+      ],
+      "mustNotMatch": [
+        "\\$\\s?\\d"
+      ],
+      "cites": false
+    }
+  ]
+}

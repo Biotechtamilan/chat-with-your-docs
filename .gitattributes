@@ -1,0 +1,8 @@
+# Binary files must never have their line endings rewritten.
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.zip binary
+*.ico binary

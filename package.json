@@ -1,0 +1,49 @@
+{
+  "name": "chat-with-your-docs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1",
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "eval": "vitest run --config vitest.eval.config.mts --reporter=verbose",
+    "check": "npm run lint && npm run typecheck && npm run test"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.110",
+    "@ai-sdk/gateway": "^4.0.156",
+    "@ai-sdk/google": "^4.0.128",
+    "@ai-sdk/openai": "^4.0.125",
+    "@ai-sdk/openai-compatible": "^3.0.96",
+    "@ai-sdk/react": "^4.0.188",
+    "@electric-sql/pglite": "^0.6.0",
+    "@electric-sql/pglite-pgvector": "^0.1.0",
+    "@huggingface/transformers": "^4.3.2",
+    "@napi-rs/canvas": "^1.2.1",
+    "ai": "^7.0.183",
+    "mammoth": "^1.13.0",
+    "next": "16.4.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "unpdf": "^2.2.2",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.4",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.6",
+    "typescript": "^5",
+    "vitest": "^5.1.2"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "description": "Marginalia: chat with your documents, with the evidence in the margin"
+}
