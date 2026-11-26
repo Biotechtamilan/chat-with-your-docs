@@ -1,10 +1,21 @@
 import { describe, expect, it } from "vitest";
 import { estimateCostUsd } from "./ai/models";
 import { MockEmbedder } from "./ai/embedder";
-import { getConfig } from "./config";
+import { NextRequest } from "next/server";
+import { config as proxyConfig, proxy } from "../proxy";
+import { getConfig, parseAllowedHosts } from "./config";
 import { analyzeCitations } from "./generation/citations";
 import { buildUserMessage, formatSources } from "./generation/prompts";
-import { checkQuestion, checkUpload, escapeForSourceBlock, isCrossSiteRequest, rateLimitKey, RateLimiter } from "./guardrails";
+import {
+  checkQuestion,
+  checkUpload,
+  escapeForSourceBlock,
+  isAllowedHost,
+  isCrossSiteRequest,
+  rateLimitKey,
+  RateLimiter,
+  WRONG_HOST_MESSAGE,
+} from "./guardrails";
 import { cleanPdfText, htmlToMarkdown, parseDocument, parseMarkdown, UnsupportedFileError } from "./ingest/parse";
 import { reciprocalRankFusion } from "./retrieval/fusion";
 import { toTsQuery } from "./retrieval/lexical";
@@ -133,6 +144,33 @@ describe("guardrails", () => {
     expect(from({ origin: "https://evil.example", host: "localhost:3000" })).toBe(true);
     expect(from({ origin: "http://localhost:3000", host: "localhost:3000" })).toBe(false);
     expect(from({})).toBe(false); // curl and other non-browser clients
+  });
+
+  it("answers only to the names it is told to, on any port", () => {
+    const local = parseAllowedHosts("localhost,127.0.0.1,[::1]");
+    for (const host of ["localhost", "localhost:3000", "127.0.0.1:3000", "[::1]:3000", "LOCALHOST:3000"]) {
+      expect(isAllowedHost(host, local), host).toBe(true);
+    }
+    // A rebinding page sends its own name; a lookalike is not the same name.
+    for (const host of ["evil.example", "evil.example:3000", "localhost.evil.example", "127.0.0.1.nip.io", ""]) {
+      expect(isAllowedHost(host, local), host).toBe(false);
+    }
+    expect(isAllowedHost(null, local)).toBe(false);
+    expect(isAllowedHost("docs.example.com", parseAllowedHosts(" Docs.Example.com:443 , localhost"))).toBe(true);
+    expect(isAllowedHost("anything.example", parseAllowedHosts("*"))).toBe(true);
+    // An empty setting means the default, never "refuse everything".
+    expect(parseAllowedHosts(" , ")).toEqual(["localhost", "127.0.0.1", "[::1]"]);
+    expect(getConfig().allowedHosts).toEqual(["localhost", "127.0.0.1", "[::1]"]);
+  });
+
+  it("refuses an API request addressed to another name before any route sees it", async () => {
+    const call = (host: string) => proxy(new NextRequest("http://localhost:3000/api/documents", { headers: { host } }));
+    const refused = call("evil.example:3000");
+    expect(refused.status).toBe(403);
+    expect(((await refused.json()) as { error: string }).error).toBe(WRONG_HOST_MESSAGE);
+    // Let through: Next marks a passed request with this header.
+    expect(call("localhost:3000").headers.get("x-middleware-next")).toBe("1");
+    expect(proxyConfig.matcher).toBe("/api/:path*");
   });
 
   it("does not let a caller pick its own rate-limit bucket", () => {

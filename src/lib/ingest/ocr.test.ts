@@ -127,6 +127,7 @@ describe("provider detection", () => {
     GUIDE_INPUT_CHARS: 12_000,
     MAX_NOTES: 500,
     TRUST_PROXY: "false",
+    ALLOWED_HOSTS: "localhost,127.0.0.1,[::1]",
   } as const;
 
   it("prefers the gateway, then falls through the other keys in order", () => {

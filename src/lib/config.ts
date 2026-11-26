@@ -17,6 +17,17 @@ export type { ProviderName } from "./types";
  */
 /** Short enough to type, long enough that guessing it is not an attack. */
 const SETTINGS_TOKEN_MIN_CHARS = 24;
+/** This machine only, which is all a localhost server needs. */
+const DEFAULT_ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]"];
+
+/** "localhost:3000, Docs.Example" becomes ["localhost", "docs.example"]; an empty list falls back to the default. */
+export function parseAllowedHosts(value: string): string[] {
+  const names = value
+    .split(",")
+    .map((name) => name.trim().toLowerCase().replace(/:\d{1,5}$/, ""))
+    .filter(Boolean);
+  return names.length > 0 ? names : DEFAULT_ALLOWED_HOSTS;
+}
 
 const schema = z.object({
   // One of these credentials connects a chat model. See detectProvider below.
@@ -99,6 +110,13 @@ const schema = z.object({
   MAX_NOTES: z.coerce.number().int().min(1).default(500),
   /** Set to "true" only when the app sits behind a proxy you control that appends X-Forwarded-For. */
   TRUST_PROXY: z.enum(["true", "false"]).default("false"),
+  /**
+   * Host names the API answers to, comma separated, any port. A web page that
+   * points its own domain at this machine (DNS rebinding) is same-origin to the
+   * browser, so only the Host header gives it away. "*" turns the check off,
+   * for a deployment behind your own proxy and login.
+   */
+  ALLOWED_HOSTS: z.string().trim().default(DEFAULT_ALLOWED_HOSTS.join(",")),
 });
 
 type Env = z.infer<typeof schema>;
@@ -161,6 +179,8 @@ export interface AppConfig {
   guideInputChars: number;
   maxNotes: number;
   trustProxy: boolean;
+  /** Host names the API answers to, without ports. "*" allows any. */
+  allowedHosts: string[];
 }
 
 /** Name recorded for the fake embedder, so its vectors never share an index with real ones. */
@@ -328,6 +348,7 @@ export function buildConfig(
     guideInputChars: env.GUIDE_INPUT_CHARS,
     maxNotes: env.MAX_NOTES,
     trustProxy: env.TRUST_PROXY === "true",
+    allowedHosts: parseAllowedHosts(env.ALLOWED_HOSTS),
   };
 }
 

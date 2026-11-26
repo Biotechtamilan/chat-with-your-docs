@@ -61,6 +61,24 @@ export function isCrossSiteRequest(headers: Headers): boolean {
 export const CROSS_SITE_MESSAGE = "This request came from another site and was refused.";
 
 /**
+ * True when the request is addressed to a name this app answers to.
+ *
+ * The cross-site check above cannot see DNS rebinding. A page on evil.example
+ * points its own name at 127.0.0.1, and its requests to this app are then
+ * same-origin as far as the browser knows, so it could read the documents.
+ * Those requests still carry evil.example as the Host header, which this
+ * refuses. Ports are ignored. "*" allows any name.
+ */
+export function isAllowedHost(host: string | null, allowed: readonly string[]): boolean {
+  if (allowed.includes("*")) return true;
+  if (!host) return false;
+  return allowed.includes(host.trim().toLowerCase().replace(/:\d{1,5}$/, ""));
+}
+
+export const WRONG_HOST_MESSAGE =
+  "This app only answers requests addressed to localhost. To open it under another name, add that name to ALLOWED_HOSTS and restart.";
+
+/**
  * Which bucket a request counts against.
  *
  * The leftmost value of X-Forwarded-For is whatever the caller typed, so
